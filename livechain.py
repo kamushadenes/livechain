@@ -2,6 +2,7 @@ import asyncio
 import websockets
 import json
 import cefevent
+import sys
 
 
 class Livechain(object):
@@ -12,12 +13,18 @@ class Livechain(object):
         self.hostname = hostname
         self.port = port
 
+        if self.syslog:
+            self.cefsender = cefevent.CEFSender([], self.hostname, self.port)
+
     def format_tx(self, tx, log_format='CEF'):
         if log_format == 'CEF':
             x = tx['x']
             out = x['out']
             inputs = x['inputs'][0]
             c = cefevent.CEFEvent()
+            c.set_field('name', 'Blockchain Transaction')
+            c.set_field('deviceVendor', 'HPE Brazil SecLab')
+            c.set_field('deviceProduct', 'Livechain')
             c.set_field('deviceEventClassId', tx['op'])
             c.set_field('externalId', x['tx_index'])
             c.set_field('deviceCustomString1', x['hash'])
@@ -58,11 +65,12 @@ class Livechain(object):
                 for l in logs:
                     print(l)
                     if self.syslog:
-                        cs = cefevent.CEFSender([], self.hostname, self.port)
-                        cs.send_log(l)
+                        self.cefsender.send_log(l)
 
 if __name__ == '__main__':
-    lc = Livechain(syslog=True, hostname='127.0.0.1', port=10514)
+    hostname = sys.argv[1]
+    port = sys.argv[2]
+    lc = Livechain(syslog=True, hostname=hostname, port=port)
     try:
         asyncio.get_event_loop().run_until_complete(lc.listen())
     except:
