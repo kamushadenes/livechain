@@ -32,7 +32,7 @@ class Livechain(object):
             c.set_field('bytesIn', inputs['prev_out']['value'])
             c.set_field('oldFileSize', x['size'])
             c.set_field('deviceVersion', str(x['ver']))
-            c.set_field('endTime', x['time'])
+            c.set_field('endTime', int(x['time']) * 1000)
             c.set_field('deviceAddress', x['relayed_by'])
             c.set_field('sourceUserName', inputs['prev_out']['addr'])
             c.set_field('sourceUserId', inputs['prev_out']['script'])
