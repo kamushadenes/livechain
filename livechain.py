@@ -11,7 +11,7 @@ class Livechain(object):
     def __init__(self, syslog=False, hostname=None, port=None):
         self.syslog = syslog
         self.hostname = hostname
-        self.port = port
+        self.port = int(port)
 
         if self.syslog:
             self.cefsender = cefevent.CEFSender([], self.hostname, self.port)
